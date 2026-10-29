@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import ssl
 import sys
 import urllib.error
@@ -41,6 +42,11 @@ class ChromecastAPI:
                 payload: dict[str, Any] | None = None) -> tuple[int, str, Any]:
         data = None
         headers = {"Accept": "application/json"}
+        # Protected setup endpoints may require the device-local authorization token.
+        # Keep it in an environment variable so it is not hard-coded or logged.
+        token = os.environ.get("CAST_LOCAL_AUTHORIZATION_TOKEN")
+        if token:
+            headers["cast-local-authorization-token"] = token
         if payload is not None:
             data = json.dumps(payload).encode("utf-8")
             headers["Content-Type"] = "application/json"
@@ -131,6 +137,7 @@ def cmd_backup(api: ChromecastAPI, host: str) -> int:
 
 def cmd_telemetry_off(api: ChromecastAPI, host: str, apply: bool) -> int:
     info = api.info()
+    print("Authorization token configured:", bool(os.environ.get("CAST_LOCAL_AUTHORIZATION_TOKEN")))
     print("Current opt-in settings:")
     print(json.dumps(info.get("opt_in", {}), indent=2))
     if not apply:
