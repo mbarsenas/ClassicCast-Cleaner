@@ -11,6 +11,8 @@
 - The probe returned HTTP 404 for `/setup/configured_networks`, `/setup/supported_locales`, `/setup/supported_timezones`, `/setup/supported_languages`, and `/setup/supported_time_formats` on this firmware.
 - `GET /setup/set_eureka_info` returned HTTP 405. This indicates GET is not accepted at that path; it does not prove a POST payload will work.
 - `/setup/reboot` returned HTTP 405 to the attempted GET in an earlier test. The project does not attempt reboot.
+- `POST /setup/set_eureka_info` with `{"opt_in":{"stats":false,"crash":false}}` returned HTTP 401 on 2026-10-29. No settings change was confirmed; a pre-change backup was saved locally.
+- Protocol documentation reports that protected setup endpoints require the `cast-local-authorization-token` header, while `/setup/eureka_info` is an exception. The CLI now supports the token through `CAST_LOCAL_AUTHORIZATION_TOKEN`; token acquisition is deliberately not automated.
 
 These results are from one device and firmware version only. A 404 for a guessed path is not evidence that the capability is absent; the path may be incorrect or unavailable on this build.
 
