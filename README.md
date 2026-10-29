@@ -51,6 +51,17 @@ python .\\castclean.py --host 192.168.1.208 telemetry-off --apply
 
 The tool saves a local backup first, submits `stats=false` and `crash=false`, and reads the device information again. This write path is experimental and must be verified on each firmware version; a successful HTTP status alone is not proof the settings persisted.
 
+If the write returns `HTTP 401`, the device requires a local authorization token for protected setup endpoints. The tool supports the `CAST_LOCAL_AUTHORIZATION_TOKEN` environment variable and sends it in the `cast-local-authorization-token` header. The token is not bundled with this project, printed, or saved to disk. Obtain it only through a legitimate Google Home app/session you control; do not paste it into an issue or commit it to Git. Example PowerShell prompt that avoids echoing the token:
+
+```powershell
+$secure = Read-Host "Local Chromecast authorization token" -AsSecureString
+$env:CAST_LOCAL_AUTHORIZATION_TOKEN = [System.Net.NetworkCredential]::new("", $secure).Password
+python .\\castclean.py --host 192.168.1.208 telemetry-off --apply
+Remove-Item Env:CAST_LOCAL_AUTHORIZATION_TOKEN
+```
+
+Do not keep retrying writes without a valid token. If you do not have a legitimate way to obtain one, leave the setting unchanged and use the project for read-only research.
+
 ## Development
 
 ```powershell
